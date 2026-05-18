@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/_Oqtane/">
+    <Project Path="../oqtane.framework/Oqtane.Client/Oqtane.Client.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
+    <Project Path="../oqtane.framework/Oqtane.Shared/Oqtane.Shared.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
+    <Project Path="..\oqtane.framework\Oqtane.Server\Oqtane.Server.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
+  </Folder>
+  <Project Path="Client\GIBS.Module.ReportViewer.Client.csproj" />
+  <Project Path="Package\GIBS.Module.ReportViewer.Package.csproj" />
+  <Project Path="Server\GIBS.Module.ReportViewer.Server.csproj" />
+  <Project Path="Shared\GIBS.Module.ReportViewer.Shared.csproj" />
+</Solution>

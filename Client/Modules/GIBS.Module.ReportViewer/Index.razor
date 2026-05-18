@@ -1,0 +1,79 @@
+@using GIBS.Module.ReportViewer.Services
+@using GIBS.Module.ReportViewer.Models
+
+@namespace GIBS.Module.ReportViewer
+@inherits ModuleBase
+@inject IReportViewerService ClientReportViewerService
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<Index> Localizer
+
+@if (_ReportViewers == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <ActionLink Action="Add" Security="SecurityAccessLevel.Edit" Text="Add ReportViewer" ResourceKey="Add" />
+    <br />
+    <br />
+    @if (@_ReportViewers.Count != 0)
+    {
+        <Pager Items="@_ReportViewers">
+            <Header>
+                <th style="width: 1px;">&nbsp;</th>
+                <th style="width: 1px;">&nbsp;</th>
+                <th>@Localizer["Name"]</th>
+            </Header>
+            <Row>
+                <td><ActionLink Action="Edit" Parameters="@($"id=" + context.ReportViewerId.ToString())" ResourceKey="Edit"  /></td>
+                <td><ActionDialog Header="Delete ReportViewer" Message="Are You Sure You Wish To Delete This ReportViewer?" Action="Delete" Security="SecurityAccessLevel.Edit" Class="btn btn-danger" OnClick="@(async () => await Delete(context))" ResourceKey="Delete"  Id="@context.ReportViewerId.ToString()" /></td>
+                <td>@context.Name</td>
+            </Row>
+        </Pager>
+    }
+    else
+    {
+        <p>@Localizer["Message.DisplayNone"]</p>
+    }
+}
+
+@code {
+    public override string RenderMode => RenderModes.Static;
+
+    public override List<Resource> Resources => new List<Resource>()
+    {
+        new Stylesheet("_content/GIBS.Module.ReportViewer/Module.css"),
+        new Script("_content/GIBS.Module.ReportViewer/Module.js")
+    };
+
+    List<ReportViewer> _ReportViewers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _ReportViewers = await ClientReportViewerService.GetReportViewersAsync(ModuleState.ModuleId);
+        }
+        catch (Exception ex)
+        {
+            await logger.LogError(ex, "Error Loading ReportViewer {Error}", ex.Message);
+            AddModuleMessage(Localizer["Message.LoadError"], MessageType.Error);
+        }
+    }
+
+    private async Task Delete(ReportViewer ReportViewer)
+    {
+        try
+        {
+            await ClientReportViewerService.DeleteReportViewerAsync(ReportViewer.ReportViewerId, ModuleState.ModuleId);
+            await logger.LogInformation("ReportViewer Deleted {ReportViewer}", ReportViewer);
+            _ReportViewers = await ClientReportViewerService.GetReportViewersAsync(ModuleState.ModuleId);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await logger.LogError(ex, "Error Deleting ReportViewer {ReportViewer} {Error}", ReportViewer, ex.Message);
+            AddModuleMessage(Localizer["Message.DeleteError"], MessageType.Error);
+        }
+    }
+}
