@@ -6,25 +6,97 @@
 
 <div class="container">
     <div class="row mb-1 align-items-center">
-        <Label Class="col-sm-3" For="value" HelpText="Enter a value" ResourceKey="SettingName" ResourceType="@resourceType">Name: </Label>
-            <div class="col-sm-9">
-                <input id="value" type="text" class="form-control" @bind="@_value" />
-            </div>
+        <Label Class="col-sm-3" For="datasource" HelpText="Choose local tenant database or remote SQL database">Data Source: </Label>
+        <div class="col-sm-9">
+            <select id="datasource" class="form-select" @bind="@_dataSource">
+                <option value="Local">Local</option>
+                <option value="Remote">Remote</option>
+            </select>
+        </div>
     </div>
+
+    @if (_dataSource == "Remote")
+    {
+        <div class="row mb-1 align-items-center">
+            <Label Class="col-sm-3" For="connectionstring" HelpText="Remote SQL connection string">Connection String: </Label>
+            <div class="col-sm-9">
+                <input id="connectionstring" type="text" class="form-control" @bind="@_connectionString" />
+            </div>
+        </div>
+    }
+
+    <div class="row mb-1 align-items-center">
+        <Label Class="col-sm-3" For="sqlquery" HelpText="Free-form SQL query to execute">SQL Query: </Label>
+        <div class="col-sm-9">
+            <textarea id="sqlquery" class="form-control" rows="8" @bind="@_sqlQuery"></textarea>
+        </div>
+    </div>
+
+    <div class="row mb-1 align-items-center">
+        <Label Class="col-sm-3" For="cacheminutes" HelpText="Cache duration in minutes. Use 0 to disable cache">Cache Minutes: </Label>
+        <div class="col-sm-9">
+            <input id="cacheminutes" type="number" min="0" max="1440" class="form-control" @bind="@_cacheDurationMinutes" />
+        </div>
+    </div>
+
+    <div class="row mb-1 align-items-center">
+        <Label Class="col-sm-3" For="viewmode" HelpText="Choose table grid or tokenized template rendering">View Mode: </Label>
+        <div class="col-sm-9">
+            <select id="viewmode" class="form-select" @bind="@_viewMode">
+                <option value="Table">Table</option>
+                <option value="Template">Template</option>
+            </select>
+        </div>
+    </div>
+
+    @if (_viewMode == "Template")
+    {
+        <div class="row mb-1 align-items-center">
+            <Label Class="col-sm-3" For="templateheader" HelpText="Renders once before all row output">Template Header: </Label>
+            <div class="col-sm-9">
+                <textarea id="templateheader" class="form-control" rows="4" @bind="@_templateHeader"></textarea>
+            </div>
+        </div>
+        <div class="row mb-1 align-items-center">
+            <Label Class="col-sm-3" For="template" HelpText="Use tokens like [ColumnName] or {{ColumnName}}. Renders for each row">Template: </Label>
+            <div class="col-sm-9">
+                <textarea id="template" class="form-control" rows="8" @bind="@_template"></textarea>
+            </div>
+        </div>
+        <div class="row mb-1 align-items-center">
+            <Label Class="col-sm-3" For="templatefooter" HelpText="Renders once after all row output">Template Footer: </Label>
+            <div class="col-sm-9">
+                <textarea id="templatefooter" class="form-control" rows="4" @bind="@_templateFooter"></textarea>
+            </div>
+        </div>
+    }
 </div>
 
 @code {
-    private string resourceType = "GIBS.Module.ReportViewer.Settings, GIBS.Module.ReportViewer.Client.Oqtane"; // for localization
     public override string Title => "ReportViewer Settings";
 
-    string _value;
+    private string _dataSource = Models.ReportViewerSettings.DataSourceLocal;
+    private string _connectionString = string.Empty;
+    private string _sqlQuery = string.Empty;
+    private string _viewMode = Models.ReportViewerSettings.ViewModeTable;
+    private string _templateHeader = string.Empty;
+    private string _template = string.Empty;
+    private string _templateFooter = string.Empty;
+    private int _cacheDurationMinutes = 5;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             Dictionary<string, string> settings = await SettingService.GetModuleSettingsAsync(ModuleState.ModuleId);
-            _value = SettingService.GetSetting(settings, "SettingName", "");
+            _dataSource = SettingService.GetSetting(settings, "ReportViewer:DataSource", Models.ReportViewerSettings.DataSourceLocal);
+            _connectionString = SettingService.GetSetting(settings, "ReportViewer:ConnectionString", string.Empty);
+            _sqlQuery = SettingService.GetSetting(settings, "ReportViewer:SqlQuery", string.Empty);
+            _viewMode = SettingService.GetSetting(settings, "ReportViewer:ViewMode", Models.ReportViewerSettings.ViewModeTable);
+            _templateHeader = SettingService.GetSetting(settings, "ReportViewer:TemplateHeader", string.Empty);
+            _template = SettingService.GetSetting(settings, "ReportViewer:Template", string.Empty);
+            _templateFooter = SettingService.GetSetting(settings, "ReportViewer:TemplateFooter", string.Empty);
+            int.TryParse(SettingService.GetSetting(settings, "ReportViewer:CacheDurationMinutes", "5"), out _cacheDurationMinutes);
         }
         catch (Exception ex)
         {
@@ -36,8 +108,30 @@
     {
         try
         {
+            if (string.IsNullOrWhiteSpace(_sqlQuery))
+            {
+                AddModuleMessage("SQL Query is required.", MessageType.Warning);
+                return;
+            }
+
+            if (_dataSource == Models.ReportViewerSettings.DataSourceRemote && string.IsNullOrWhiteSpace(_connectionString))
+            {
+                AddModuleMessage("Connection String is required for remote data source.", MessageType.Warning);
+                return;
+            }
+
+            _cacheDurationMinutes = Math.Clamp(_cacheDurationMinutes, 0, 1440);
+
             var settings = await SettingService.GetModuleSettingsAsync(ModuleState.ModuleId);
-            settings = SettingService.SetSetting(settings, "SettingName", _value);
+            settings = SettingService.SetSetting(settings, "ReportViewer:DataSource", _dataSource);
+            settings = SettingService.SetSetting(settings, "ReportViewer:ConnectionString", _connectionString ?? string.Empty, true);
+            settings = SettingService.SetSetting(settings, "ReportViewer:SqlQuery", _sqlQuery ?? string.Empty);
+            settings = SettingService.SetSetting(settings, "ReportViewer:ViewMode", _viewMode);
+            settings = SettingService.SetSetting(settings, "ReportViewer:TemplateHeader", _templateHeader ?? string.Empty);
+            settings = SettingService.SetSetting(settings, "ReportViewer:Template", _template ?? string.Empty);
+            settings = SettingService.SetSetting(settings, "ReportViewer:TemplateFooter", _templateFooter ?? string.Empty);
+            settings = SettingService.SetSetting(settings, "ReportViewer:CacheDurationMinutes", _cacheDurationMinutes.ToString());
+
             await SettingService.UpdateModuleSettingsAsync(settings, ModuleState.ModuleId);
         }
         catch (Exception ex)

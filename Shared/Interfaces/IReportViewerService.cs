@@ -14,5 +14,7 @@ namespace GIBS.Module.ReportViewer.Services
         Task<Models.ReportViewer> UpdateReportViewerAsync(Models.ReportViewer ReportViewer);
 
         Task DeleteReportViewerAsync(int ReportViewerId, int ModuleId);
+
+        Task<Models.ReportExecutionResult> ExecuteReportAsync(int moduleId, bool bypassCache);
     }
 }

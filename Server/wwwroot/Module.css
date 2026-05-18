@@ -1,1 +1,39 @@
 /* Module Custom Styles */
+
+/* Base container setup */
+.hovereffect {
+    max-width: 100%;
+}
+
+    /* Image zoom effect (optional but nice) */
+    .hovereffect img {
+        transition: transform 0.4s ease-in-out;
+    }
+
+    .hovereffect:hover img {
+        transform: scale(1.05);
+    }
+
+    /* Overlay initial state and smooth transition */
+    .hovereffect .overlay {
+        background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent dark background */
+        opacity: 0;
+        transition: opacity 0.35s ease-in-out;
+    }
+
+    /* Reveal overlay on hover */
+    .hovereffect:hover .overlay {
+        opacity: 1;
+    }
+
+    /* Animate the elements inside the overlay slightly for premium feel */
+    .hovereffect .overlay h2,
+    .hovereffect .overlay .info {
+        transform: translateY(15px);
+        transition: transform 0.35s ease-in-out;
+    }
+
+    .hovereffect:hover .overlay h2,
+    .hovereffect:hover .overlay .info {
+        transform: translateY(0);
+    }

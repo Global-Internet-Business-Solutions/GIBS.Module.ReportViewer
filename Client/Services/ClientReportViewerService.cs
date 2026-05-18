@@ -39,5 +39,10 @@ namespace GIBS.Module.ReportViewer.Services
         {
             await DeleteAsync(CreateAuthorizationPolicyUrl($"{Apiurl}/{ReportViewerId}/{ModuleId}", EntityNames.Module, ModuleId));
         }
+
+        public async Task<Models.ReportExecutionResult> ExecuteReportAsync(int moduleId, bool bypassCache)
+        {
+            return await GetJsonAsync<Models.ReportExecutionResult>(CreateAuthorizationPolicyUrl($"{Apiurl}/execute/{moduleId}?bypassCache={bypassCache}", EntityNames.Module, moduleId), new Models.ReportExecutionResult { Success = false, ErrorMessage = "Unable to execute report." });
+        }
     }
 }

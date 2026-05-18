@@ -22,6 +22,20 @@ namespace GIBS.Module.ReportViewer.Controllers
             _ReportViewerService = ReportViewerService;
         }
 
+        [HttpGet("execute/{moduleid}")]
+        [Authorize(Policy = PolicyNames.ViewModule)]
+        public async Task<Models.ReportExecutionResult> Execute(int moduleid, bool bypassCache = false)
+        {
+            if (IsAuthorizedEntityId(EntityNames.Module, moduleid))
+            {
+                return await _ReportViewerService.ExecuteReportAsync(moduleid, bypassCache);
+            }
+
+            _logger.Log(LogLevel.Error, this, LogFunction.Security, "Unauthorized ReportViewer Execute Attempt {ModuleId}", moduleid);
+            HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+            return new Models.ReportExecutionResult { Success = false, ErrorMessage = "Unauthorized" };
+        }
+
         // GET: api/<controller>?moduleid=x
         [HttpGet]
         [Authorize(Policy = PolicyNames.ViewModule)]
