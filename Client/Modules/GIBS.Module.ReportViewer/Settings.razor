@@ -82,7 +82,7 @@
     private string _templateHeader = string.Empty;
     private string _template = string.Empty;
     private string _templateFooter = string.Empty;
-    private int _cacheDurationMinutes = 5;
+    private int _cacheDurationMinutes = 120;
 
     protected override async Task OnInitializedAsync()
     {
@@ -96,7 +96,7 @@
             _templateHeader = SettingService.GetSetting(settings, "ReportViewer:TemplateHeader", string.Empty);
             _template = SettingService.GetSetting(settings, "ReportViewer:Template", string.Empty);
             _templateFooter = SettingService.GetSetting(settings, "ReportViewer:TemplateFooter", string.Empty);
-            int.TryParse(SettingService.GetSetting(settings, "ReportViewer:CacheDurationMinutes", "5"), out _cacheDurationMinutes);
+            int.TryParse(SettingService.GetSetting(settings, "ReportViewer:CacheDurationMinutes", "120"), out _cacheDurationMinutes);
         }
         catch (Exception ex)
         {

@@ -20,12 +20,15 @@ else if (!_result.Success)
 }
 else
 {
-    <div class="d-flex justify-content-between align-items-center mb-2">
-        <div>
-            <strong>Generated:</strong> @_result.GeneratedOnUtc.ToLocalTime().ToString("g")
+    @if (IsAuthorizedPermission(PermissionNames.Edit))
+    {
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div>
+                <strong>Generated:</strong> @_result.GeneratedOnUtc.ToLocalTime().ToString("g")
+            </div>
+            <button type="button" class="btn btn-secondary" @onclick="RefreshReport">Refresh</button>
         </div>
-        <button type="button" class="btn btn-secondary" @onclick="RefreshReport">Refresh</button>
-    </div>
+    }
 
     @if (_result.ViewMode == ReportViewerSettings.ViewModeTemplate)
     {
@@ -55,7 +58,7 @@ else
                             <tr>
                                 @foreach (var column in _result.Columns)
                                 {
-                                    <td>@(row.TryGetValue(column, out var value) ? value : string.Empty)</td>
+                                    <td>@((MarkupString)(row.TryGetValue(column, out var value) ? value ?? string.Empty : string.Empty))</td>
                                 }
                             </tr>
                         }
