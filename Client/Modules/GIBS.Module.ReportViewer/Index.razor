@@ -1,10 +1,21 @@
 @using GIBS.Module.ReportViewer.Services
 @using GIBS.Module.ReportViewer.Models
+@using Oqtane.Licensing
 
 @namespace GIBS.Module.ReportViewer
 @inherits ModuleBase
 @inject IReportViewerService ClientReportViewerService
 @inject IStringLocalizer<Index> Localizer
+
+
+<LicenseView PackageName="@ModuleState.ModuleDefinition.PackageName">
+    <Licensed>
+
+    </Licensed>
+    <NotLicensed>
+
+    </NotLicensed>
+</LicenseView>
 
 @if (_loading)
 {

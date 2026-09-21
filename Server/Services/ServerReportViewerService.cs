@@ -132,7 +132,7 @@ namespace GIBS.Module.ReportViewer.Services
             var settings = LoadSettings(moduleId);
             if (string.IsNullOrWhiteSpace(settings.SqlQuery))
             {
-                return new Models.ReportExecutionResult { Success = false, ErrorMessage = "SQL query setting is required." };
+                return new Models.ReportExecutionResult { Success = false, ErrorMessage = "ReportViewerSQL query setting is required." };
             }
 
             if (settings.DataSource == Models.ReportViewerSettings.DataSourceRemote && string.IsNullOrWhiteSpace(settings.ConnectionString))

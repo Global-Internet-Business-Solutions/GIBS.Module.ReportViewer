@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>$projectname$</id>
-        <version>1.0.0</version>
+        <version>1.0.2</version>
         <authors>GIBS</authors>
         <owners>GIBS</owners>
         <title>ReportViewer</title>
@@ -21,6 +21,9 @@
         </packageTypes>
     </metadata>
     <files>
+        <file src="..\Client\bin\Release\$targetframework$\Oqtane.Licensing.Client.Oqtane.dll" target="lib\$targetframework$" />
+        <file src="..\Client\bin\Release\$targetframework$\Oqtane.Licensing.Shared.Oqtane.dll" target="lib\$targetframework$" />
+        <file src="..\Client\bin\Release\$targetframework$\Oqtane.Licensing.Server.Oqtane.dll" target="lib\$targetframework$" />
         <file src="..\Client\bin\Release\$targetframework$\$ProjectName$.Client.Oqtane.dll" target="lib\$targetframework$" />
         <file src="..\Client\bin\Release\$targetframework$\$ProjectName$.Client.Oqtane.pdb" target="lib\$targetframework$" />
         <file src="..\Server\bin\Release\$targetframework$\$ProjectName$.Server.Oqtane.dll" target="lib\$targetframework$" />
